@@ -8,24 +8,24 @@ evo_likelihood <- c()
 #for each sample
 for (sample in samples){
   #ablang
-  evo_likelihood_ablang_cdr3_from_VDJ <- read.csv(paste0("../data/OVA_V7/VDJ/",sample,"/evo_likelihoods/cdr3_from_VDJ/evo_likelihood_ablang.csv"), header = TRUE)
-  evo_likelihood_ablang_cdr3_only <- read.csv(paste0("../data/OVA_V7/VDJ/",sample,"/evo_likelihoods/cdr3_only/evo_likelihood_ablang.csv"), header = TRUE)
-  evo_likelihood_ablang_full_VDJ <- read.csv(paste0("../data/OVA_V7/VDJ/",sample,"/evo_likelihoods/full_VDJ/evo_likelihood_ablang.csv"), header = TRUE)
+  evo_likelihood_ablang_cdr3_from_VDJ <- read.csv(paste0("../data/",dataset,"/VDJ/",sample,"/evo_likelihoods/cdr3_from_VDJ/evo_likelihood_ablang.csv"), header = TRUE)
+  evo_likelihood_ablang_cdr3_only <- read.csv(paste0("../data/",dataset,"/VDJ/",sample,"/evo_likelihoods/cdr3_only/evo_likelihood_ablang.csv"), header = TRUE)
+  evo_likelihood_ablang_full_VDJ <- read.csv(paste0("../data/",dataset,"/VDJ/",sample,"/evo_likelihoods/full_VDJ/evo_likelihood_ablang.csv"), header = TRUE)
   
   #sapiens
-  evo_likelihood_sapiens_cdr3_from_VDJ <- read.csv(paste0("../data/OVA_V7/VDJ/",sample,"/evo_likelihoods/cdr3_from_VDJ/evo_likelihood_sapiens.csv"), header = TRUE)
-  evo_likelihood_sapiens_cdr3_only <- read.csv(paste0("../data/OVA_V7/VDJ/",sample,"/evo_likelihoods/cdr3_only/evo_likelihood_sapiens.csv"), header = TRUE)
-  evo_likelihood_sapiens_full_VDJ <- read.csv(paste0("../data/OVA_V7/VDJ/",sample,"/evo_likelihoods/full_VDJ/evo_likelihood_sapiens.csv"), header = TRUE)
+  evo_likelihood_sapiens_cdr3_from_VDJ <- read.csv(paste0("../data/",dataset,"/VDJ/",sample,"/evo_likelihoods/cdr3_from_VDJ/evo_likelihood_sapiens.csv"), header = TRUE)
+  evo_likelihood_sapiens_cdr3_only <- read.csv(paste0("../data/",dataset,"/VDJ/",sample,"/evo_likelihoods/cdr3_only/evo_likelihood_sapiens.csv"), header = TRUE)
+  evo_likelihood_sapiens_full_VDJ <- read.csv(paste0("../data/",dataset,"/VDJ/",sample,"/evo_likelihoods/full_VDJ/evo_likelihood_sapiens.csv"), header = TRUE)
   
   #esm
-  evo_likelihood_esm_cdr3_from_VDJ <- read.csv(paste0("../data/OVA_V7/VDJ/",sample,"/evo_likelihoods/cdr3_from_VDJ/evo_likelihood_esm.csv"), header = TRUE)
-  evo_likelihood_esm_cdr3_only <- read.csv(paste0("../data/OVA_V7/VDJ/",sample,"/evo_likelihoods/cdr3_only/evo_likelihood_esm.csv"), header = TRUE)
-  evo_likelihood_esm_full_VDJ <- read.csv(paste0("../data/OVA_V7/VDJ/",sample,"/evo_likelihoods/full_VDJ/evo_likelihood_esm.csv"), header = TRUE)
+  evo_likelihood_esm_cdr3_from_VDJ <- read.csv(paste0("../data/",dataset,"/VDJ/",sample,"/evo_likelihoods/cdr3_from_VDJ/evo_likelihood_esm.csv"), header = TRUE)
+  evo_likelihood_esm_cdr3_only <- read.csv(paste0("../data/",dataset,"/VDJ/",sample,"/evo_likelihoods/cdr3_only/evo_likelihood_esm.csv"), header = TRUE)
+  evo_likelihood_esm_full_VDJ <- read.csv(paste0("../data/",dataset,"/VDJ/",sample,"/evo_likelihoods/full_VDJ/evo_likelihood_esm.csv"), header = TRUE)
   
   #protbert
-  evo_likelihood_protbert_cdr3_from_VDJ <- read.csv(paste0("../data/OVA_V7/VDJ/",sample,"/evo_likelihoods/cdr3_from_VDJ/evo_likelihood_protbert.csv"), header = TRUE)
-  evo_likelihood_protbert_cdr3_only <- read.csv(paste0("../data/OVA_V7/VDJ/",sample,"/evo_likelihoods/cdr3_only/evo_likelihood_protbert.csv"), header = TRUE)
-  evo_likelihood_protbert_full_VDJ <- read.csv(paste0("../data/OVA_V7/VDJ/",sample,"/evo_likelihoods/full_VDJ/evo_likelihood_protbert.csv"), header = TRUE)
+  evo_likelihood_protbert_cdr3_from_VDJ <- read.csv(paste0("../data/",dataset,"/VDJ/",sample,"/evo_likelihoods/cdr3_from_VDJ/evo_likelihood_protbert.csv"), header = TRUE)
+  evo_likelihood_protbert_cdr3_only <- read.csv(paste0("../data/",dataset,"/VDJ/",sample,"/evo_likelihoods/cdr3_only/evo_likelihood_protbert.csv"), header = TRUE)
+  evo_likelihood_protbert_full_VDJ <- read.csv(paste0("../data/",dataset,"/VDJ/",sample,"/evo_likelihoods/full_VDJ/evo_likelihood_protbert.csv"), header = TRUE)
   
   evo_likelihood_sample <- cbind(evo_likelihood_ablang_cdr3_from_VDJ,
                                  evo_likelihood_ablang_cdr3_only[,ncol(evo_likelihood_ablang_cdr3_only)],
