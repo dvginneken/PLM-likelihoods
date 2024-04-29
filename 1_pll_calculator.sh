@@ -11,8 +11,7 @@
 
 cd /hpc/dla_lti/dvanginneken/PLM-likelihoods/scripts
 modes=("cdr3_only" "full_VDJ" "cdr3_from_VDJ")
-#datasets=("OVA_V7" "horns2020a__VDJ_RAW")
-datasets="COVID"
+datasets=("OVA_V7" "horns2020a__VDJ_RAW" "Flu_10x")
 for mode in "${modes[@]}"
 do
     for data in "${datasets[@]}"
