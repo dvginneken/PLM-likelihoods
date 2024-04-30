@@ -1,6 +1,6 @@
 #!/bin/bash
-#SBATCH --time=02:00:00
-#SBATCH --mem=32G
+#SBATCH --time=10:00:00
+#SBATCH --mem=100G
 #SBATCH --cpus-per-task=12
 #SBATCH --job-name=VDJ
 #SBATCH --error=log/CreateVDJ.error

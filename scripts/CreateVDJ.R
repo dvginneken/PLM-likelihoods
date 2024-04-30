@@ -9,7 +9,7 @@ args = commandArgs(trailingOnly=TRUE)
 dataset <- args[1]
 
 #List the sample
-samples <- list.dirs(path = paste0("../data/",dataset,"/VDJ"), full.names = FALSE, recursive = FALSE)
+samples <- list.dirs(path = paste0("../data/",dataset,"/VDJ"), full.names = TRUE, recursive = FALSE)
 
 #Build the VDJ dataframe
 source("/hpc/dla_lti/dvanginneken/Platypus/VDJ_build.R")

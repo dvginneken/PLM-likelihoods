@@ -13,7 +13,7 @@ for(sample in samples){
   #Subset the dataframe per sample
   df_sample <- df[df$original_sample_id == sample,]
   
-  for(chain in c("IGH", "IGK")){
+  for(chain in c("IGH", "IGK", "IGL")){
     
     #Subset the dataframe per chain
     df_chain <- df_sample[df_sample$chain == chain,]
