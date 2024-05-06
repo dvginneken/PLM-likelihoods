@@ -4,14 +4,14 @@
 #SBATCH --nodes=1
 #SBATCH --gpus-per-node=1
 #SBATCH --mem=100gb
-#SBATCH --time=100:00:00
+#SBATCH --time=50:00:00
 #SBATCH --output=log/pll_calculator.out
 #SBATCH --error=log/pll_calculator.error
 
 
 cd /hpc/dla_lti/dvanginneken/PLM-likelihoods/scripts
 modes=("cdr3_only" "full_VDJ" "cdr3_from_VDJ")
-datasets=("OVA_V7" "horns2020a__VDJ_RAW" "Flu_10x")
+datasets=("OVA_V7" "horns2020a__VDJ_RAW" "Bruhn")
 for mode in "${modes[@]}"
 do
     for data in "${datasets[@]}"

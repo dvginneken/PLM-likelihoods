@@ -7,7 +7,6 @@ import argparse
 sys.path.append("../src")
 
 from ablang_model import Ablang
-from antiberty_model import Antiberty
 from ESM_model import ESM
 from sapiens_model import Sapiens
 from protbert import ProtBert
