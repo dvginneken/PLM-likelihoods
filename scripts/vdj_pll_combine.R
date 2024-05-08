@@ -29,4 +29,4 @@ for(chain in c("IGH", "IGK", "IGL")){
 }
 
 save(vdj, file = paste0("../data/",dataset,"/VDJ_PLL_",dataset,".RData"))
-
+write.csv(vdj, paste0("../data/",datasets,"/vdj_evolike_combine.csv", row.names=F)

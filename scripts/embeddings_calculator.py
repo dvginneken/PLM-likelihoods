@@ -59,7 +59,7 @@ if mode == "general":
         embeds.to_csv(os.path.join(save_path,f"embeddings_{suffixes[i]}.csv"), index=False)   
 
 else:
-    data_folder_path = os.path.join("..","..","..","data",dataset,"VDJ")
+    data_folder_path = os.path.join("..","data",dataset,"VDJ")
 
     columns_to_save = ["barcode","contig_id","chain","v_gene","d_gene","j_gene","c_gene","raw_clonotype_id","raw_consensus_id"]
 

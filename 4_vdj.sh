@@ -7,7 +7,7 @@
 
 cd /hpc/dla_lti/dvanginneken/PLM-likelihoods/scripts
 #datasets=("OVA_V7" "horns2020a__VDJ_RAW")
-datasets="Bruhn"
+datasets="OVA_V7"
 for data in "${datasets[@]}"
   do
       Rscript CreateVDJ.R $data
