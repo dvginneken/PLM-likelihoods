@@ -9,10 +9,12 @@
 
 cd /hpc/dla_lti/dvanginneken/PLM-likelihoods/scripts
 #datasets=("OVA_V7" "horns2020a__VDJ_RAW")
-datasets="Bruhn"
+datasets="Bieberich"
 for data in "${datasets[@]}"
   do
       Rscript SourceCorrelation_chains.R $data
       Rscript PLMCorrelation_chains.R $data
+      Rscript SourceCorrelation.R $data
+      Rscript PLMCorrelation.R $data
   done
 echo "finished"

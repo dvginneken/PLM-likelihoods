@@ -30,7 +30,8 @@ no_IGD = args.no_IGD
 
 mode = "full_VDJ"
 
-model_names = ["ablang","sapiens","protbert","esm"]
+#model_names = ["ablang","sapiens","protbert","esm"]
+model_names = ["esm"]
 data = pd.read_csv(os.path.join("..","data",dataset,"vdj_evolike_combine.csv"))
 
 data_folder_path = os.path.join("..","data",dataset,"VDJ")
@@ -73,8 +74,8 @@ for i, model in enumerate(model_names):
 
         embeddings_file = pd.read_csv(embeddings_path, compression="gzip")
         embeddings_file = embeddings_file.loc[embeddings_file["chain"] == "IGH",:].reset_index(drop=True)
-        embeddings_file["VDJ_cgene"] = embeddings_file["VDJ_cgene"].replace(IgG_subtypes,"IGHG")
-        embeddings_file["v_gene_family"] = embeddings_file["VDJ_vgene"].apply(lambda x: x.split('-')[0])
+        embeddings_file["c_gene"] = embeddings_file["c_gene"].replace(IgG_subtypes,"IGHG")
+        embeddings_file["v_gene_family"] = embeddings_file["v_gene"].apply(lambda x: x.split('-')[0])
         embeddings_file["sample_id"] = sample["sample_id"]
 
         if no_IGD:
@@ -159,7 +160,7 @@ for i, model in enumerate(model_names):
                     evo.tl.velocity_graph(adata)
                 else:
                     evo.tl.velocity_graph(adata, model_name=model)
-    
+                
                 del adata.uns['model']
                 
                 group_dict[sub_group] = adata 

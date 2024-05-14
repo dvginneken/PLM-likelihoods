@@ -10,7 +10,8 @@
 
 
 cd /hpc/dla_lti/dvanginneken/PLM-likelihoods/scripts
-datasets=("OVA_V7" "horns2020a__VDJ_RAW" "Bruhn")
+#datasets=("OVA_V7" "horns2020a__VDJ_RAW" "Bruhn")
+datasets="Bieberich"
 for data in "${datasets[@]}"
 do
     python3 germline_embeddings_calculator.py --dataset=$data

@@ -10,10 +10,12 @@
 
 
 cd /hpc/dla_lti/dvanginneken/PLM-likelihoods/scripts
-datasets=("OVA_V7" "horns2020a__VDJ_RAW" "Bruhn")
-for data in "${datasets[@]}"
-do
-    python3 evo_velo_adata_maker.py --dataset=$data --group="sample_id" --include_germline
-    echo "done $data"
-done
-echo "finished"
+#datasets=("OVA_V7" "horns2020a__VDJ_RAW" "Bruhn")
+#for data in "${datasets[@]}"
+#do
+#    python3 evo_velo_adata_maker_karlis.py --dataset=$data
+#    echo "done $data"
+#done
+#echo "finished"
+
+python3 evo_velo_adata_maker_karlis.py --dataset_file="../data/Bruhn/VDJ/Bruhn/embeddings/full_VDJ/embeddings_esm.csv.gzip" --model="ESM"

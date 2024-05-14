@@ -2,6 +2,7 @@
 #SBATCH --job-name=evovelocity_plot
 #SBATCH --mem=32gb
 #SBATCH --time=2:00:00
+#SBATCH --partition=gpu
 #SBATCH --output=log/evovelocity_plot.out
 #SBATCH --error=log/evovelocity_plot.error
 
