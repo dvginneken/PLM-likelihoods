@@ -32,9 +32,9 @@ df_horns <- df_horns[df_horns$sample == "Individual1",]
 df_bruhn$sample <- "Individual2"
 
 df_bieberich$sample <- case_match(df_bieberich$sample,
-                              "S6" ~ "Individual3",
-                              "S7" ~ "Individual4",
-                              "S8" ~ "Individual5")
+                              "S2" ~ "Individual3",
+                              "S4" ~ "Individual4",
+                              "S7" ~ "Individual5")
 
 df <- rbind(df_ova, df_horns, df_bruhn, df_bieberich)
 
@@ -94,9 +94,9 @@ df_horns <- df_horns[df_horns$sample == "Individual1",]
 df_bruhn$sample <- "Individual2"
 
 df_bieberich$sample <- case_match(df_bieberich$sample,
-                                  "S6" ~ "Individual3",
-                                  "S7" ~ "Individual4",
-                                  "S8" ~ "Individual5")
+                                  "S2" ~ "Individual3",
+                                  "S4" ~ "Individual4",
+                                  "S7" ~ "Individual5")
 
 df <- rbind(df_ova, df_horns, df_bruhn, df_bieberich)
 
@@ -153,9 +153,9 @@ df_horns <- df_horns[df_horns$sample == "Individual1",]
 df_bruhn$sample <- "Individual2"
 
 df_bieberich$sample <- case_match(df_bieberich$sample,
-                                  "S6" ~ "Individual3",
-                                  "S7" ~ "Individual4",
-                                  "S8" ~ "Individual5")
+                                  "S2" ~ "Individual3",
+                                  "S4" ~ "Individual4",
+                                  "S7" ~ "Individual5")
 
 df <- rbind(df_ova, df_horns, df_bruhn, df_bieberich)
 df <- pivot_longer(df, cols = 1:3, names_to = "source", values_to = "correlation")
@@ -214,9 +214,9 @@ df_horns <- df_horns[df_horns$sample == "Individual1",]
 df_bruhn$sample <- "Individual2"
 
 df_bieberich$sample <- case_match(df_bieberich$sample,
-                                  "S6" ~ "Individual3",
-                                  "S7" ~ "Individual4",
-                                  "S8" ~ "Individual5")
+                                  "S2" ~ "Individual3",
+                                  "S4" ~ "Individual4",
+                                  "S7" ~ "Individual5")
 
 df <- rbind(df_ova, df_horns, df_bruhn, df_bieberich)
 
