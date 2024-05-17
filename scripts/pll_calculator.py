@@ -18,7 +18,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-d','--dataset',required=False)   
 parser.add_argument('--mode') 
 parser.add_argument('--file_path', required=False)
-# parser.add_argument('--sequences_file', default="sequences")
+parser.add_argument('--sequences_column', default="full_sequence")
 
 
 args = parser.parse_args()
@@ -42,6 +42,9 @@ if mode == "general":
 
     if not os.path.exists(save_path):
         os.mkdir(save_path)
+
+    sequences_column = args.sequences_column
+    repertoire_file["full_sequence"] = repertoire_file[sequences_column]
 
     starts = [0]*repertoire_file.shape[0]
     ends = repertoire_file["full_sequence"].apply(len)
