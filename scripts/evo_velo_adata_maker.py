@@ -1,175 +1,158 @@
-import os 
-import sys
-import argparse
-import evolocity as evo
-import anndata
-import pandas as pd
-import numpy as np
+import matplotlib
 import torch
+from evolocity.tools.fb_model import FBModel
+import argparse
+import pandas as pd
+import anndata
+import evolocity as evo
 import scanpy as sc
-import pickle as pkl
-
+import matplotlib.pyplot as plt
+import numpy as np
+import os
 parser = argparse.ArgumentParser()
-
-parser.add_argument('-d','--dataset')
-parser.add_argument('--group', default="v_gene_family")
-parser.add_argument('--include_germline', action='store_true') 
-parser.add_argument('--no_IGD', action='store_true') 
-parser.add_argument('--no_IGM', action='store_true') 
-parser.add_argument('--only_IGM', action='store_true')           
-# parser.add_argument('--mode') 
+parser.add_argument("-m", "--model", help="Choose a model: esm, ablang, protbert, sapiens")
+parser.add_argument("-i", "--input_source", help="cdr3_only or full_VDJ")
+parser.add_argument("-d", "--dataset")
 
 args = parser.parse_args()
-
+model = args.model
+input_source = args.input_source
 dataset = args.dataset
-group = args.group
-include_germline = args.include_germline
-no_IGM = args.no_IGM
-only_IGM = args.only_IGM
-no_IGD = args.no_IGD
 
-mode = "full_VDJ"
+all_embeddings = list()
 
-#model_names = ["ablang","sapiens","protbert","esm"]
-model_names = ["esm"]
-data = pd.read_csv(os.path.join("..","data",dataset,"vdj_evolike_combine.csv"))
+## Per sample
+for sample_id in os.listdir(os.path.join("..","data",dataset,"VDJ")):
+    #Get embeddings, substring the barcode, only keep heavy chain, and remove NA values from dimensions and barcodes
+    embedding_file = os.path.join("..","data",dataset,"VDJ",sample_id,"embeddings",input_source,f"embeddings_{model}.csv.gzip")
+    embeddings_df = pd.read_csv(embedding_file, compression="gzip")
+    embeddings_df['barcode'] = embeddings_df['barcode'].str[:-2] 
+    embeddings_df = embeddings_df[embeddings_df['chain'] == "IGH"]
+    embeddings_df = embeddings_df.dropna(subset=["dim_0"])
+    embeddings_df = embeddings_df.dropna(subset=["barcode"])
 
-data_folder_path = os.path.join("..","data",dataset,"VDJ")
-germlines_path = os.path.join("..","data",dataset,"all_germline_embeddings")
+    #Get VDJ information for a specific sample
+    vdj_file = os.path.join("..","data",dataset,"vdj_evolike_combine.csv")
+    vdj_df = pd.read_csv(vdj_file)
+    vdj_df_s = vdj_df[vdj_df['sample_id'] == sample_id]
 
-model_dict = {}
+    #Match embeddings and vdj metadata
+    df_merged = pd.merge(embeddings_df, vdj_df_s, on='barcode', how='inner')
+    all_embeddings.append(df_merged)
 
-IgG_subtypes = ["IGHG1","IGHG2B","IGHG2C","IGHG3"]
+    #Get the sequences
+    if input_source == "full_VDJ":
+        sequences = [str(gene) for gene in df_merged['VDJ_sequence_aa_trimmed']]
+    if input_source == "cdr3_only":
+        sequences = [str(gene) for gene in df_merged['VDJ_cdr3_aa']]
+
+    #Get other metadata to plot
+    IgG_subtypes = ["IGHG1","IGHG2","IGHG2B","IGHG2C","IGHG3","IGHG4"]
+    IgA_subtypes = ["IGHA1","IGHA2"]
+    df_merged["c_gene"] = df_merged["c_gene"].replace(IgG_subtypes,"IgG").replace(IgA_subtypes,"IgA").replace("IGHM","IgM").replace("IGHD","IgD").replace("IGHE","IgE")
+    isotype = [str(gene) for gene in df_merged['c_gene']]
+    shm_count = [float(count) for count in df_merged["SHM_count"]]
+    #sample = [str(s) for s in df_merged['sample_id_x']]
+    clonotype = [str(cl) for cl in df_merged['clonotype_id']]
+    df_merged['v_gene'] = df_merged['v_gene'].apply(lambda x: x.split('-')[0])
+    v_gene_family = [str(gene) for gene in df_merged['v_gene']]
+  
+
+    #Get embedding columns and metadata columns
+    embedding_cols = [col for col in df_merged.columns if col.startswith('dim')]
+    metadata_cols = [col for col in df_merged.columns if col not in embedding_cols]
+
+    #Create an AnnData object
+    adata = anndata.AnnData(df_merged[embedding_cols])
+
+    #Add sequence and metadata information to .obs slot of AnnData object
+    adata.obs['seq'] = sequences
+    adata.obs['isotype'] = isotype
+    adata.obs["SHM_count"] = shm_count
+    #adata.obs["sample"] = sample
+    adata.obs["clonotype"] = clonotype
+    adata.obs["v_gene_family"] = v_gene_family
+
+
+    #Construct sequence similarity network
+    evo.pp.neighbors(adata)
+    sc.tl.umap(adata)
+    basis = "umap"
+    print(adata.to_df().duplicated().sum())
+    if model  == "esm":
+        evo.tl.velocity_graph(adata)
+    else:
+        evo.tl.velocity_graph(adata, model_name = model)
+    if 'model' in adata.uns:
+        del adata.uns['model']
+
+    #Embed network and velocities in two-dimensions
+    evo.tl.velocity_embedding(adata, basis = basis)
+
+    #Save the processed AnnData object to a file
+    output_file = os.path.join("..","data",dataset,"evo-velocity",f"adata_{sample_id}_{input_source}_{model}.h5ad")
+    adata.write(output_file)
+    print(f"Processed data saved to {output_file}")
+
+
+## Samples combined
+embeddings = pd.concat(all_embeddings, ignore_index=True)
+df_merged = embeddings
+
+#Get the sequences
+if input_source == "full_VDJ":
+    sequences = [str(gene) for gene in df_merged['VDJ_sequence_aa_trimmed']]
+if input_source == "cdr3_only":
+    sequences = [str(gene) for gene in df_merged['VDJ_cdr3_aa']]
+
+#Get other metadata to plot
+IgG_subtypes = ["IGHG1","IGHG2","IGHG2B","IGHG2C","IGHG3","IGHG4"]
 IgA_subtypes = ["IGHA1","IGHA2"]
+df_merged["c_gene"] = df_merged["c_gene"].replace(IgG_subtypes,"IgG").replace(IgA_subtypes,"IgA").replace("IGHM","IgM").replace("IGHD","IgD").replace("IGHE","IgE")
+isotype = [str(gene) for gene in df_merged['c_gene']]
 
-model_dict = {}
+shm_count = [float(count) for count in df_merged["SHM_count"]]
+sample = [str(s) for s in df_merged['sample_id']]
+clonotype = [str(cl) for cl in df_merged['clonotype_id']]
+df_merged['v_gene'] = df_merged['v_gene'].apply(lambda x: x.split('-')[0])
+v_gene_family = [str(gene) for gene in df_merged['v_gene']]
 
-save_file_name = "evo_velo_"
+#Get embedding columns and metadata columns
+embedding_cols = [col for col in df_merged.columns if col.startswith('dim')]
+metadata_cols = [col for col in df_merged.columns if col not in embedding_cols]
 
-if no_IGM:
-    save_file_name += "no_IGM_"
-elif only_IGM:
-    save_file_name += "only_IGM_"
-if no_IGD:
-    save_file_name += "no_IGD_"
+#Create an AnnData object
+adata = anndata.AnnData(df_merged[embedding_cols])
 
-save_file_name += group
+#Add sequence and metadata information to .obs slot of AnnData object
+adata.obs['seq'] = sequences
+adata.obs['isotype'] = isotype
+adata.obs["SHM_count"] = shm_count
+adata.obs["sample"] = sample
+adata.obs["clonotype"] = clonotype
+adata.obs["v_gene_family"] = v_gene_family
 
-if include_germline:
-    save_file_name += "_germline.pkl"
+
+#Construct sequence similarity network
+evo.pp.neighbors(adata)
+sc.tl.umap(adata)
+basis = "umap"
+if model  == "esm":
+    evo.tl.velocity_graph(adata)
 else:
-    save_file_name += ".pkl"
+    evo.tl.velocity_graph(adata, model_name = model)
+if 'model' in adata.uns:
+    del adata.uns['model']
 
-save_path = os.path.join("..","data",dataset,save_file_name)
+#Embed network and velocities in two-dimensions
+evo.tl.velocity_embedding(adata, basis = basis)
 
-for i, model in enumerate(model_names):
+#Save the processed AnnData object to a file
+output_file = os.path.join("..","data",dataset,"evo-velocity",f"adata_AllSamples_{input_source}_{model}.h5ad")
+adata.write(output_file)
+print(f"Processed data saved to {output_file}")
 
-    pooled_embeds = []
-    group_dict = {}
-    
-    for _,sample in (data[["sample_id"]].drop_duplicates().iterrows()):
-        
-        cellranger_path = os.path.join(data_folder_path, sample["sample_id"])   
-        embeddings_path = os.path.join(cellranger_path,"embeddings",mode,f"embeddings_{model}.csv.gzip")
-
-        embeddings_file = pd.read_csv(embeddings_path, compression="gzip")
-        embeddings_file = embeddings_file.loc[embeddings_file["chain"] == "IGH",:].reset_index(drop=True)
-        embeddings_file["c_gene"] = embeddings_file["c_gene"].replace(IgG_subtypes,"IGHG")
-        embeddings_file["v_gene_family"] = embeddings_file["v_gene"].apply(lambda x: x.split('-')[0])
-        embeddings_file["sample_id"] = sample["sample_id"]
-
-        if no_IGD:
-            embeddings_file = embeddings_file.loc[embeddings_file["VDJ_cgene"] != "IGHD",:]
-            embeddings_file = embeddings_file.dropna(subset=["VDJ_cgene"]).reset_index(drop=True)
-        if no_IGM:
-            embeddings_file = embeddings_file.loc[embeddings_file["VDJ_cgene"] != "IGHM",:]
-            embeddings_file = embeddings_file.dropna(subset=["VDJ_cgene"]).reset_index(drop=True)
-        elif only_IGM:
-            embeddings_file = embeddings_file.loc[embeddings_file["VDJ_cgene"] == "IGHM",:]
-            embeddings_file = embeddings_file.dropna(subset=["VDJ_cgene"]).reset_index(drop=True)
-
-        embedding_cols = [col for col in list(embeddings_file.columns) if col.startswith("dim")]
-        metadata_cols = list(set(embeddings_file.columns) - set(embedding_cols))
-
-        # embeddings_file = embeddings_file.drop_duplicates(embedding_cols).reset_index(drop=True)
-        embeddings_file = embeddings_file.dropna(subset=embedding_cols).reset_index(drop=True)
-
-        pooled_embeds += embeddings_file.to_dict(orient="records")
-
-    pooled_embeds = pd.DataFrame(pooled_embeds)
-    
-    pooled_embeds["barcode"] = pooled_embeds["barcode"].apply(lambda x: x.split("-")[0])
-    pooled_embeds = pooled_embeds.merge(data, on="barcode",suffixes=('', '_y'))
-    pooled_embeds = pooled_embeds.drop_duplicates("VDJ_sequence_aa_trimmed").reset_index(drop=True)
-    pooled_embeds = pooled_embeds.dropna(subset=embedding_cols + [f"IGH_evo_likelihood_{model}_full_VDJ"]).reset_index(drop=True) 
-    
-    if include_germline:
-        germline_embeddings = pd.read_csv(os.path.join(germlines_path,f"all_germline_embeddings_{model}.csv.gzip"), compression="gzip")
-        germline_embeddings["VDJ_sequence_aa_trimmed"] = germline_embeddings["VDJ_germline_aa_trimmed"].apply(lambda x: x.replace("-","").replace("*",""))
-        # germline_embeddings["barcode"] = germline_embeddings["barcode"].apply(lambda x: x.split("_")[1])
-        germline_embeddings = germline_embeddings.merge(data, on="barcode",suffixes=('', '_y'))
-        germline_embeddings["barcode"] = "germline"
-        germline_embeddings["VDJ_cgene"] = germline_embeddings["VDJ_cgene"].replace(IgG_subtypes,"IGHG")
-        germline_embeddings["v_gene_family"] = germline_embeddings["VDJ_vgene"].apply(lambda x: x.split('-')[0])
-
-        germline_embeddings = germline_embeddings.drop_duplicates("VDJ_sequence_aa_trimmed").reset_index(drop=True)
-        germline_embeddings = germline_embeddings.dropna(subset=embedding_cols + [f"IGH_evo_likelihood_{model}_full_VDJ"]).reset_index(drop=True)
-
-        germline_embeddings = germline_embeddings.to_dict(orient="records")
-     
-        pooled_embeds = pooled_embeds.to_dict(orient="records")
-        pooled_embeds += germline_embeddings
-        pooled_embeds = pd.DataFrame(pooled_embeds)
-
-    embedding_cols = [col for col in list(pooled_embeds.columns) if col.startswith("dim")]
-    metadata_cols = list(set(pooled_embeds.columns) - set(embedding_cols))
-        
-    only_embeddings = pooled_embeds[embedding_cols].copy()
-    metadata = pooled_embeds[metadata_cols].copy()
-    
-    for sub_group in pd.unique(pooled_embeds[group]):
-
-            try:
-                torch.cuda.empty_cache()
-                
-                only_embeddings_sub_group = only_embeddings.loc[metadata[group] == sub_group, :].reset_index(drop=True)
-                metadata_sub_group = metadata.loc[metadata[group] == sub_group, :].reset_index(drop=True)
-
-                adata = anndata.AnnData(only_embeddings_sub_group)
-                adata.obs["seq"] = list(metadata_sub_group["VDJ_sequence_aa_trimmed"])
-                adata.obs["barcode"] = list(metadata_sub_group["barcode"])
-                
-                adata.obs["v_gene_family"] = list(metadata_sub_group["v_gene_family"])     
-                
-
-                adata.obs["sample_id"] = list(metadata_sub_group["sample_id"]) 
-                                   
-                adata.obs["sample_clonotype"] = list(metadata_sub_group.apply(lambda x: x["sample_id"] + "_" + x["clonotype_id"], axis = 1))
-                # adata.obs["sample_clonotype_encoded"] = pd.factorize(adata.obs["sample_clonotype"])[0]
-
-                # if include_germline:
-                #     germline_indicator = list(metadata_sub_group["barcode"] == "germline")
-                #     adata.obs.loc[germline_indicator,"v_gene_family"] = "germline"
-                #     adata.obs.loc[germline_indicator,"sample_id"] = "germline"
-
-                adata.obs["v_gene_family"] = adata.obs["v_gene_family"].astype("category")
-            
-                evo.pp.neighbors(adata)
-
-                if model == "esm":
-                    evo.tl.velocity_graph(adata)
-                else:
-                    evo.tl.velocity_graph(adata, model_name=model)
-                
-                del adata.uns['model']
-                
-                group_dict[sub_group] = adata 
-                del(adata, only_embeddings_sub_group, metadata_sub_group)
-                
-            except:
-                continue
-
-    model_dict[model] = group_dict
-
-with open(save_path ,"wb") as file:
-    pkl.dump(model_dict, file)
+# # Plot your data using the color mapping (jgene or SHM_count), make sure data is categorical
+# ax = evo.pl.velocity_embedding_stream(adata, color=color, legend_loc="right margin", show=False)
+# save_path = os.path.join("..","data",dataset,"evo-velocity",f"embedding_{color}_{sample_id}_{input_source}_{model}.png")
+# plt.savefig(save_path, bbox_inches="tight")
