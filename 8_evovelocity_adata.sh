@@ -10,8 +10,8 @@
 
 export TORCH_HOME=/hpc/dla_lti/dvanginneken/cache/
 cd /hpc/dla_lti/dvanginneken/PLM-likelihoods/scripts
-#datasets=("OVA_V7" "horns2020a__VDJ_RAW" "Bruhn" "Bieberich")
-datasets="OVA_V7"
+datasets=("OVA_V7" "horns2020a__VDJ_RAW" "Bruhn" "Kim")
+#datasets="OVA_V7"
 models=("esm" "protbert" "sapiens" "ablang")
 for data in "${datasets[@]}"
 do

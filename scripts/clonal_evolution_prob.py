@@ -69,6 +69,9 @@ for j,model in enumerate(model_names):
         
             #initiate rank list
             substitute_ranks = []
+
+            #initiate probability list
+            substitute_probabilities = []
             
             #Loop over the mutational positions
             for pos in diff_positions:
@@ -82,13 +85,24 @@ for j,model in enumerate(model_names):
                 mut_rank = ranks[seq_2[pos]]
                 substitute_ranks.append(mut_rank)
 
+                #Get the probability of the mutation over this edge
+                probability = likelihood_values[seq_2[pos]]
+                substitute_probabilities.append(probability)
+
             #If there are multiple mutations in a sequence, get the average rank    
             mean_substitute_rank = np.average(substitute_ranks)
+
+            #If there are multiple mutations in a sequence, get the average rank    
+            mean_substitute_probability = np.average(substitute_probabilities)
+
         except:
             #Sapiens issue sequence length fix:
             mean_substitute_rank = None
+            mean_substitute_probability = None
 
-        output_table_model.append({"model":model,"n_subs":len(diff_positions), "mean_sub_rank":mean_substitute_rank})
+        output_table_model.append({"model":model,"n_subs":len(diff_positions), 
+                                   "mean_sub_rank":mean_substitute_rank, 
+                                   "mean_sub_prob":mean_substitute_probability})
 
     #Convert dictionary list to dataframe
     output_table_model = pd.DataFrame.from_dict(output_table_model)

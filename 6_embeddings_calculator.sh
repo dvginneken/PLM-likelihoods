@@ -12,7 +12,7 @@
 cd /hpc/dla_lti/dvanginneken/PLM-likelihoods/scripts
 modes=("cdr3_only" "full_VDJ" "cdr3_from_VDJ" "v_gene_only")
 #datasets=("OVA_V7" "horns2020a__VDJ_RAW" "Bruhn")
-datasets="Bieberich"
+datasets="Kim"
 for mode in "${modes[@]}"
 do
     for data in "${datasets[@]}"

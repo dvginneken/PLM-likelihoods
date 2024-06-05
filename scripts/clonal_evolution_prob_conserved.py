@@ -49,6 +49,9 @@ for j,model in enumerate(model_names):
     #Initiate output table for this model
     output_table_model = []
 
+    #initiate probability list
+    substitute_probabilities = []
+
     #Loop over each edge in the edge file
     for i in range(len(edges_file)):
         
@@ -70,7 +73,7 @@ for j,model in enumerate(model_names):
             #initiate rank list
             substitute_ranks = []
             
-            #Loop over the mutational positions
+            #Loop over the non-mutating positions
             for pos in conserved_positions:
                 #Get the aa probabilities for this position
                 likelihood_values = pd.Series(prob_matrix.iloc[pos,:])
@@ -82,13 +85,21 @@ for j,model in enumerate(model_names):
                 mut_rank = ranks[seq_1[pos]]
                 substitute_ranks.append(mut_rank)
 
-            #get the average rank    
-            mean_substitute_rank = np.average(substitute_ranks)
+                #Get the probability of the conserved residue over this edge
+                probability = likelihood_values[seq_1[pos]]
+                substitute_probabilities.append(probability)
+
+            #get the average rank and probability
+            mean_substitute_rank = np.average(substitute_ranks)   
+            mean_substitute_probability = np.average(substitute_probabilities)
         except:
             #Sapiens issue sequence length fix:
             mean_substitute_rank = None
+            mean_substitute_probability = None
 
-        output_table_model.append({"model":model,"n_conserved":len(conserved_positions), "mean_residue_rank":mean_substitute_rank})
+        output_table_model.append({"model":model,"n_conserved":len(conserved_positions), 
+                                   "mean_sub_rank":mean_substitute_rank, 
+                                   "mean_sub_prob":mean_substitute_probability})
 
     #Convert dictionary list to dataframe
     output_table_model = pd.DataFrame.from_dict(output_table_model)

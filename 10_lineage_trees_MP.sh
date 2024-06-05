@@ -7,11 +7,12 @@
 #SBATCH --output=log/MP_LineageTrees.out
 
 cd /hpc/dla_lti/dvanginneken/PLM-likelihoods/scripts
-datasets=("OVA_V7" "horns2020a__VDJ_RAW" "Bruhn" "Bieberich")
+#datasets=("OVA_V7" "horns2020a__VDJ_RAW" "Bruhn" "Bieberich")
+datasets="Kim"
 for data in "${datasets[@]}"
-  do
-      Rscript LineageTrees_mp.R $data
-      echo "$data done"
-  done
+do
+    Rscript LineageTrees_mp.R $data
+    echo "$data done"
+done
 echo "finished"
 

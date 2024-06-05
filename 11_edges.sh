@@ -8,7 +8,8 @@
 
 
 cd /hpc/dla_lti/dvanginneken/PLM-likelihoods/scripts
-datasets=("OVA_V7" "horns2020a__VDJ_RAW" "Bieberich" "Bruhn")
+#datasets=("OVA_V7" "horns2020a__VDJ_RAW" "Kim" "Bruhn")
+datasets="Kim"
 for data in "${datasets[@]}"
   do
       Rscript transform_edge_dataframe.R $data "MP"

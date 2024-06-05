@@ -1,5 +1,4 @@
 #This script is used to generate lineage trees using AntibodyForests
-
 library(Platypus)
 
 args = commandArgs(trailingOnly=TRUE)
