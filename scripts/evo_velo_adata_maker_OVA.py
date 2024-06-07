@@ -109,9 +109,11 @@ if input_source == "cdr3_only":
     sequences = [str(gene) for gene in df_merged['VDJ_cdr3_aa']]
 
 #Get other metadata to plot
+#Set isotypes
 IgG_subtypes = ["IGHG1","IGHG2","IGHG2B","IGHG2C","IGHG3","IGHG4"]
-IgA_subtypes = ["IGHA1","IGHA2"]
+IgA_subtypes = ["IGHA1","IGHA2", "IGHA"]
 df_merged["c_gene"] = df_merged["c_gene"].replace(IgG_subtypes,"IgG").replace(IgA_subtypes,"IgA").replace("IGHM","IgM").replace("IGHD","IgD").replace("IGHE","IgE")
+df_merged["sample_id"] = df_merged["sample_id"].replace("S1","Mouse1").replace("S2","Mouse2").replace("S3","Mouse3").replace("S4","Mouse4").replace("S5","Mouse5")
 isotype = [str(gene) for gene in df_merged['c_gene']]
 
 shm_count = [float(count) for count in df_merged["SHM_count"]]
