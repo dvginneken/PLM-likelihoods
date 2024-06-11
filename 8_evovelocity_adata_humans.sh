@@ -11,8 +11,8 @@
 export TORCH_HOME=/hpc/dla_lti/dvanginneken/cache/
 cd /hpc/dla_lti/dvanginneken/PLM-likelihoods/scripts
 
-models=("protbert" "sapiens" "ablang")
-#models="esm"
+#models=("protbert" "sapiens" "ablang")
+models="sapiens"
 for model in "${models[@]}"
 do
     python3 evo_velo_adata_maker_human.py --model=$model --input_source="full_VDJ"

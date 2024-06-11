@@ -65,6 +65,7 @@ for j,model in enumerate(model_names):
         
         #Get the position that do not mutate
         conserved_positions = [k for k in range(len(seq_1)) if seq_1[k] == seq_2[k]]
+        mutating_positions = [k for k in range(len(seq_1)) if seq_1[k] != seq_2[k]]
         
         try:
             #Calculate probability matrix (row is position in sequence, column is amino acid)
@@ -97,7 +98,7 @@ for j,model in enumerate(model_names):
             mean_substitute_rank = None
             mean_substitute_probability = None
 
-        output_table_model.append({"model":model,"n_conserved":len(conserved_positions), 
+        output_table_model.append({"model":model,"n_subs":len(mutating_positions), 
                                    "mean_sub_rank":mean_substitute_rank, 
                                    "mean_sub_prob":mean_substitute_probability})
 
