@@ -5,17 +5,13 @@ library(Platypus)
 args = commandArgs(trailingOnly=TRUE)
 dataset <- args[1]
 
-load(paste0("../data/",dataset,"/VDJ_PLL_",dataset,".RData")) #vdj
+load("/hpc/dla_lti/dvanginneken/PLM-likelihoods/data/OVA_V7/VariantTree/Variant_tree.csv") #replicated_df
 
 source("/hpc/dla_lti/dvanginneken/Platypus/AntibodyForests.R")
-af <- AntibodyForests(VDJ = vdj,
-                            sequence.columns = "VDJ_sequence_aa_trimmed",
-                            germline.columns = "VDJ_germline_aa_trimmed",
-                            node.features = c("isotype", "VDJ_vgene", "SHM_count",
-                                              "IGH_evo_likelihood_ablang_full_VDJ",
-                                              "IGH_evo_likelihood_sapiens_full_VDJ",
-                                              "IGH_evo_likelihood_protbert_full_VDJ",
-                                              "IGH_evo_likelihood_esm_full_VDJ"),
+af <- AntibodyForests(VDJ = replicated_df,
+                            sequence.columns = "VDJ_sequence_aa",
+                            germline.columns = "VDJ_germline_aa",
+                            node.features = c("),
                             construction.method = "phylo.network.default",
                             parallel = F)
 save(af, file = paste0("../data/",dataset,"/AF_",dataset,"_default_HC.RData"))
